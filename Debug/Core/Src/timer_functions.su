@@ -1,0 +1,2 @@
+../Core/Src/timer_functions.c:5:6:_tim_timeout_blocking	16	static
+../Core/Src/timer_functions.c:10:6:_tim_timeout_nonblocking_with_callback	16	static
