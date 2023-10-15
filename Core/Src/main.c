@@ -44,30 +44,13 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-// Timer and UART handle
+
+//Timer Handle
 TIM_HandleTypeDef htim6;
+// UART handle
 UART_HandleTypeDef huart2;
-
-/* USER CODE BEGIN PV */
-// Function to initialize the GPIO pin connected to the LED
-void LED_Init(void) {
-
-    // Enable the GPIOA peripheral clock
-   // RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-
-    /*
-   //Clearing and setting Pin 4 (Led Blue as Output)
-     GPIOA->MODER &= ~GPIO_MODER_MODE4_Msk; // Clear mode bits
-     GPIOA->MODER |= GPIO_MODER_MODE4_0;
-*/
-/*
-     //Defining Pin 3 as an input in an unnecessarily complicated way :)
-     GPIOA->MODER |= GPIO_MODER_MODER3_1; //(0x2UL << (6U))
-     GPIOA->MODER |= GPIO_MODER_MODER3_0;
-     GPIOA->MODER ^= (0x3UL << 6U);
-
-*/
-}
+// Button Test Variable
+int buttonPressed = 0;
 
 /* USER CODE END PV */
 
@@ -93,7 +76,6 @@ static void MX_TIM6_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	LED_Init();
   /* USER CODE END 1 */
   /* MCU Configuration--------------------------------------------------------*/
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -112,29 +94,23 @@ int main(void)
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // Printf
-  printDebug(&huart2 ," aaa  \n\n \r");
-
+  // Just a friendly neighborhood debug helper statement
+  printDebug(&huart2 ,"   New Program Start  \n\n \r");
   // Deactivate Pin 6 which is High on startup
+  // I know not the prettiest but the quickest fix
   HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
-  // Enable Timer
-  //TIM6->CR1 |= 0x1;
-  //TIM6->DIER |= 0x1;
-//Timer Stuff
-  TIM6->ARR &= 0x0;
-  TIM6->ARR |= 0x3E8;
-  HAL_TIM_Base_Start_IT(&htim6);
-
 
   while (1)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
-
+	//  _tim_timeout_blocking(4000);
+	  //for Test with button detection
+	  //Default running
+	  if(~ buttonPressed)
+		  _tim_timeout_blocking(1000);
 	  HAL_Delay(3000);
-	  printDebug(&huart2 ," ccc  \n\n \r");
-
+	  printDebug(&huart2 ,"  In Main Loop \n\n \r");
   } // End While 1
   /* USER CODE END 3 */
 } // End Main Void
@@ -223,6 +199,7 @@ static void MX_TIM6_Init(void)
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 64535;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();
@@ -327,23 +304,21 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 // My Overwriiten Interrupts
 
-	//TIM 6 Interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	// Print Debug Message
-	  printDebug(&huart2 ," bbb  \n\n \r");
 
-	  // Toggle the Green LED Pin
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
-	}
 
 	//Button Interrupt -- without debouncing for now
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	// Extra logic for correct button determination and pressed again override
 	int pinCorrect = (GPIO_Pin == GPIO_PIN_3);
 	if(pinCorrect){
-
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
-
+		//_tim_timeout_blocking(2000);
+		printDebug(&huart2 ,"  button action  \n\n \r");
+		if(buttonPressed == 0){
+			buttonPressed = 1;
+		}else{
+			buttonPressed = 0;
+		}
 	}
 
 }
@@ -358,9 +333,15 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+
   __disable_irq();
+  printDebug(&huart2 ,"  You done Upsi and stuck in Error handeler  \n\n \r");
+  // Toggle Red LED:
+  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
+
   while (1)
   {
+	  ;
   }
   /* USER CODE END Error_Handler_Debug */
 }
