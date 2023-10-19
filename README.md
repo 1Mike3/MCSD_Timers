@@ -8,9 +8,7 @@
 
 # Known Bugs:
 
-* Green LED flashes two times on Startup and i don#t know why 
-* According to the Serial Debug Prints the Interrupt gets triggered right after calling
-the blocking function but it seems to work anyway...
+
 
 # General Information:
 
@@ -20,6 +18,7 @@ the blocking function but it seems to work anyway...
 *
 
 # Concerning the Blocking functions
-* It seems Like the function Enters the Timmer Interrupt on Startup but the function seems to be working as intended?
-* I tried and failed repeatedly to use the HAL SLEEP Command, i have no clue why i can't make the commented out code work
-* Other than that i made it work but something is weird
+* It seems Like the function Enters the Timmer Interrupt on Startup but the function seems to be working as intended.
+* I tried and failed repeatedly to use the HAL SLEEP Command, i have no clue why i can't make the commented out code work,
+i made it work anyway by polling the SR register.
+

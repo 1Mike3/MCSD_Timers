@@ -13,7 +13,6 @@ extern UART_HandleTypeDef huart2;
 void _tim_timeout_blocking(uint32_t time){
 
 	 printDebug(&huart2 ,"  Entered blocking function \n\n \r");
-
 	 //Activate The Timer
 	 HAL_TIM_Base_Init(&htim6);
 	 TIM6->ARR = time;
