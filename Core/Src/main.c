@@ -24,8 +24,10 @@
 //LIB
 #include "String.h"
 //OWN
+
 #include "debug_functions.h"
 #include "timer_functions.h"
+#include "stdbool.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,17 +42,18 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+// to test if the button has been pressed in the interrupt
+int buttonPressed = 0;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
-//Timer Handle
+TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim6;
-// UART handle
+TIM_HandleTypeDef htim7;
+
 UART_HandleTypeDef huart2;
-// Button Test Variable
-int buttonPressed = 0;
+
+/* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
@@ -59,6 +62,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_TIM2_Init(void);
+static void MX_TIM7_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -72,28 +77,34 @@ static void MX_TIM6_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-//S#######################################################################################################################
 int main(void)
 {
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
+
   /* MCU Configuration--------------------------------------------------------*/
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+
   /* USER CODE BEGIN Init */
   /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
   /* USER CODE BEGIN SysInit */
   /* USER CODE END SysInit */
+
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-
   MX_TIM6_Init();
-
+  MX_TIM2_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   // Just a friendly neighborhood debug helper statement
@@ -102,23 +113,27 @@ int main(void)
   // I know not the prettiest but the quickest fix
   HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
 
-
+#define DELAYTIME_BLOCKING 500
+#define DELAYTIME_NONBLOCKING 1500
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
 	//  _tim_timeout_blocking(4000);
 	  //for Test with button detection
 	  //Default running
-	  if(~ buttonPressed)
-		  _tim_timeout_blocking(1000);
-	  HAL_Delay(3000);
+	  if(buttonPressed == 0){
+		  _tim_timeout_blocking(DELAYTIME_BLOCKING);
+	  }else{
+
+		  _tim_timeout_nonblocking_with_callback(DELAYTIME_NONBLOCKING, * customCallbackFunction );
+	  }
+	 // HAL_Delay(3000);
 	  printDebug(&huart2 ,"  In Main Loop \n\n \r");
   } // End While 1
   /* USER CODE END 3 */
-} // End Main Void
-
-//E#########################################################################################################################
+}
 
 /**
   * @brief System Clock Configuration
@@ -181,6 +196,51 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 0;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 4294967295;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
   * @brief TIM6 Initialization Function
   * @param None
   * @retval None
@@ -198,11 +258,11 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 32000-1;
+ htim6.Init.Prescaler = 32000-1;
+
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 64535;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();
@@ -216,6 +276,44 @@ static void MX_TIM6_Init(void)
   /* USER CODE BEGIN TIM6_Init 2 */
 
   /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
+  * @brief TIM7 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM7_Init(void)
+{
+
+  /* USER CODE BEGIN TIM7_Init 0 */
+
+  /* USER CODE END TIM7_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM7_Init 1 */
+
+  /* USER CODE END TIM7_Init 1 */
+  htim7.Instance = TIM7;
+  htim7.Init.Prescaler = 32000-1;
+  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim7.Init.Period = 65535;
+  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM7_Init 2 */
+
+  /* USER CODE END TIM7_Init 2 */
 
 }
 
@@ -270,8 +368,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-
-  //The GUI scewed me over so commented out
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_RED_Pin|LED_GREEN_Pin, GPIO_PIN_RESET);
 
@@ -313,19 +409,41 @@ static void MX_GPIO_Init(void)
 
 	//Button Interrupt -- without debouncing for now
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	__disable_irq();
+	HAL_SuspendTick();
+//
+
 	// Extra logic for correct button determination and pressed again override
-	int pinCorrect = (GPIO_Pin == GPIO_PIN_3);
-	if(pinCorrect){
+	bool pinCorrect = (GPIO_Pin == GPIO_PIN_3);
+	bool firstState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
+	bool debounceSucessfull = false;
+
+	// Extra logic for Debouncing (very crude, i know but not part of the assignment
+	for (int i = 0; i < 1000000; ++i) {
+				;
+			}
+	bool secondState = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3);
+	if(secondState == firstState){
+		debounceSucessfull = true;
+	}
+
+	if(pinCorrect && debounceSucessfull){
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
 		//_tim_timeout_blocking(2000);
 		printDebug(&huart2 ,"  button action  \n\n \r");
 		if(buttonPressed == 0){
 			buttonPressed = 1;
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
 		}else{
 			buttonPressed = 0;
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 		}
 	}
 
+	__enable_irq();
+	HAL_ResumeTick();
 }
 
 /* USER CODE END 4 */
