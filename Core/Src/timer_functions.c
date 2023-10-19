@@ -84,7 +84,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		// Print Debug Message
 			 printDebug(&huart2 ,"  Entered Interrupt  \n\n \r");
 			  // Toggle the Green LED Pin
-			  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
+			  HAL_GPIO_TogglePin(GPIOA, LED_BLUE_Pin);
 			  //TIM6->ARR &= 0x0;
 			  HAL_TIM_Base_Stop_IT(&htim7);
 			  	  printDebug(&huart2 ,"  Timer Finished Waiting  \n\n \r");

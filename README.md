@@ -9,6 +9,16 @@
 # Known Bugs:
 
 
+# Function Description
+	The Code Runs in a While true loop in main.
+	Ther User can switch between the blocking and nonblocking version by pushing the Button.
+	Blocking funtion active on Startup (onboard LED off).
+	Nonblocking funciton activated on Buttion Press (onboard LED on).
+	To visually distiguish the funcitons:
+	Blocking funciton uses the green LED.
+	Non-Blocking fucntion uses the blue LED.
+	
+	
 
 # General Information:
 
@@ -18,7 +28,6 @@
 *
 
 # Concerning the Blocking functions
-* It seems Like the function Enters the Timmer Interrupt on Startup but the function seems to be working as intended.
 * I tried and failed repeatedly to use the HAL SLEEP Command, i have no clue why i can't make the commented out code work,
 i made it work anyway by polling the SR register.
 

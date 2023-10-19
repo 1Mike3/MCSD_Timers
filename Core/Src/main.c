@@ -81,21 +81,15 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
   /* USER CODE BEGIN Init */
   /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN SysInit */
   /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
@@ -109,16 +103,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   // Just a friendly neighborhood debug helper statement
   printDebug(&huart2 ,"   New Program Start  \n\n \r");
-  // Deactivate Pin 6 which is High on startup
-  // I know not the prettiest but the quickest fix
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_6);
-
 #define DELAYTIME_BLOCKING 500
 #define DELAYTIME_NONBLOCKING 1500
-  while (1)
+  while (true)
   {
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
 	//  _tim_timeout_blocking(4000);
 	  //for Test with button detection
@@ -126,7 +115,6 @@ int main(void)
 	  if(buttonPressed == 0){
 		  _tim_timeout_blocking(DELAYTIME_BLOCKING);
 	  }else{
-
 		  _tim_timeout_nonblocking_with_callback(DELAYTIME_NONBLOCKING, * customCallbackFunction );
 	  }
 	 // HAL_Delay(3000);
@@ -258,8 +246,7 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
- htim6.Init.Prescaler = 32000-1;
-
+  htim6.Init.Prescaler = 32000-1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 64535;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -369,7 +356,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED_RED_Pin|LED_GREEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_BLUE_Pin|LED_RED_Pin|LED_GREEN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(BOARD_STATUS_GPIO_Port, BOARD_STATUS_Pin, GPIO_PIN_RESET);
@@ -380,8 +367,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BUTTON_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LED_RED_Pin LED_GREEN_Pin */
-  GPIO_InitStruct.Pin = LED_RED_Pin|LED_GREEN_Pin;
+  /*Configure GPIO pins : LED_BLUE_Pin LED_RED_Pin LED_GREEN_Pin */
+  GPIO_InitStruct.Pin = LED_BLUE_Pin|LED_RED_Pin|LED_GREEN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -433,12 +420,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		printDebug(&huart2 ,"  button action  \n\n \r");
 		if(buttonPressed == 0){
 			buttonPressed = 1;
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_BLUE_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_RED_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_GREEN_Pin, GPIO_PIN_SET);
 		}else{
 			buttonPressed = 0;
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_BLUE_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_RED_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, LED_GREEN_Pin, GPIO_PIN_SET);
 		}
 	}
 
