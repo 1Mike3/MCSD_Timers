@@ -12,8 +12,8 @@
 # Function Description
 	The Code Runs in a While true loop in main.
 	Ther User can switch between the blocking and nonblocking version by pushing the Button.
-	Blocking funtion active on Startup (onboard LED off).
-	Nonblocking funciton activated on Buttion Press (onboard LED on).
+	Blocking funtion active on Startup.
+	Nonblocking funciton activated on Buttion Press.
 	To visually distiguish the funcitons:
 	Blocking funciton uses the green LED.
 	Non-Blocking fucntion uses the blue LED.

@@ -1,4 +1,7 @@
-../Core/Src/timer_functions.c:14:6:_tim_timeout_blocking	24	static
-../Core/Src/timer_functions.c:44:6:_tim_timeout_nonblocking_with_callback	24	static
-../Core/Src/timer_functions.c:66:6:customCallbackFunction	8	static
-../Core/Src/timer_functions.c:74:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/timer_functions.c:15:6:_tim_timeout_blocking	24	static
+../Core/Src/timer_functions.c:46:6:_tim_timeout_nonblocking_with_callback	16	static
+../Core/Src/timer_functions.c:86:6:customCallbackFunction	16	static
+../Core/Src/timer_functions.c:96:8:safeCallbackFunciton	16	static
+../Core/Src/timer_functions.c:107:6:helperSetAllLedLow	8	static
+../Core/Src/timer_functions.c:114:6:helperBlink	24	static
+../Core/Src/timer_functions.c:128:6:HAL_TIM_PeriodElapsedCallback	24	static
