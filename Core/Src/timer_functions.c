@@ -3,16 +3,18 @@
 #include "debug_functions.h"
 #include "timer_functions.h"
 #include "stm32l4xx_hal_tim.h"
+#include "stdbool.h"
 
 //Timer Handles
 extern TIM_HandleTypeDef htim6;
 extern TIM_HandleTypeDef htim7;
 // UART handle
 extern UART_HandleTypeDef huart2;
-
+extern int buttonPressed;
 //Timer INIT is done in main.c
 
 void _tim_timeout_blocking(uint32_t time){
+
 
 	 printDebug(&huart2 ,"  Entered blocking function \n\n \r");
 	 //Activate The Timer
@@ -44,40 +46,21 @@ void _tim_timeout_blocking(uint32_t time){
 
 
 void _tim_timeout_nonblocking_with_callback(uint16_t time,void (*callbacFunction)(void) ){
-/*
-	 printDebug(&huart2 ,"  Entered NON blocking function \n\n \r");
-	 //Activate The Timer
-	 HAL_TIM_Base_Init(&htim7);
-	 TIM7->ARR = time;
-	  HAL_TIM_Base_Start_IT(&htim7);
 
-	  // Old school way, worked but trying correct sleep mode
-
-	  //Put the System in Idle while the Timer Runs
-	  int timerStatus = 1; // 0 == TimerIsCounting, 1 == Timer has counted up to it's Value
-	  while(timerStatus){
-		  timerStatus = (TIM7->SR != 0x1); //Checking for the status of the SR Register
-		//  printDebug(&huart2 ,"  Timer is Waiting  \n\n \r");
-		//  HAL_Delay(1000);
-	  }
-	callbacFunction();
-*/
 				HAL_TIM_Base_Stop_IT(&htim6);
 				HAL_GPIO_WritePin(GPIOA, LED_BLUE_Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(GPIOA, LED_RED_Pin, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(GPIOA, LED_GREEN_Pin, GPIO_PIN_SET);
 
 		 printDebug(&huart2 ,"  Entered NON blocking function \n\n \r");
+
 	 //Activate The Timer
 	 HAL_TIM_Base_Init(&htim7);
 	 TIM7->ARR = time;
 	  HAL_TIM_Base_Start_IT(&htim7);
 
-
 // safe the callback function to use it later in the interrupt
 safeCallbackFunciton(SAFECALLBACKFUCNTIONMODE_WRITE, callbacFunction);
-
-
 }
 
 
@@ -86,7 +69,7 @@ safeCallbackFunciton(SAFECALLBACKFUCNTIONMODE_WRITE, callbacFunction);
 void customCallbackFunction(void){
 	printDebug(&huart2 ,"  enteredCallbackFucntion \n\n \r");
 	HAL_GPIO_TogglePin(GPIOA, LED_BLUE_Pin);
-	for(int i = 0; i < 10000000; i++){
+	for(int i = 0; i < 3000000; i++){
 		;
 	}
 }
@@ -119,6 +102,9 @@ void helperBlink(int count, int frequency){
 		  HAL_GPIO_WritePin(GPIOA, LED_GREEN_Pin, GPIO_PIN_RESET);
 		  HAL_Delay(frequency);
 		 helperSetAllLedLow();
+		 if((buttonPressed == 0)){
+			 return;
+		 }
 		  HAL_Delay(frequency);
 		  }
 }
@@ -147,6 +133,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 				  HAL_TIM_Base_Stop_IT(&htim7);
 					  f();
 					  printDebug(&huart2 ,"  Timer Finished Waiting  \n\n \r");
+
 			 }
 		 }
 

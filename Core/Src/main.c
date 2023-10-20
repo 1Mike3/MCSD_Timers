@@ -24,7 +24,7 @@
 //LIB
 #include "String.h"
 //OWN
-
+int buttonPressed = 0;
 #include "debug_functions.h"
 #include "timer_functions.h"
 #include "stdbool.h"
@@ -42,8 +42,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-// to test if the button has been pressed in the interrupt
-int buttonPressed = 0;
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -105,7 +104,7 @@ int main(void)
   printDebug(&huart2 ,"   New Program Start  \n\n \r");
   //TIM7->SR = 0x0;
 #define DELAYTIME_BLOCKING 500
-#define DELAYTIME_NONBLOCKING 1000
+#define DELAYTIME_NONBLOCKING 3000
   while (true)
   {
     /* USER CODE END WHILE */
@@ -116,8 +115,9 @@ int main(void)
 	  if(buttonPressed == 0){
 		  _tim_timeout_blocking(DELAYTIME_BLOCKING);
 	  }else{
+
 		  _tim_timeout_nonblocking_with_callback(DELAYTIME_NONBLOCKING, customCallbackFunction );
-		  helperBlink(20, 150);
+		  helperBlink(15, 200);
 
 
 	  }
@@ -400,10 +400,9 @@ static void MX_GPIO_Init(void)
 
 	//Button Interrupt -- with crude debouncing
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	__disable_irq();
-	HAL_SuspendTick();
+//	__disable_irq();
+//	HAL_SuspendTick();
 //
-
 
 	// Extra logic for correct button determination and pressed again override
 
@@ -411,8 +410,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	bool firstState = HAL_GPIO_ReadPin(GPIOB, BUTTON_Pin);
 	bool debounceSucessfull = false;
 
+
 	// Extra logic for Debouncing (very crude, i know but not part of the assignment
-	for (int i = 0; i < 1000000; ++i) {
+	for (int i = 0; i < 100000; ++i) {
 				;
 			}
 	bool secondState = HAL_GPIO_ReadPin(GPIOB, BUTTON_Pin);
@@ -420,8 +420,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		debounceSucessfull = true;
 	}
 
-	if(pinCorrect && (firstState == false) && (debounceSucessfull) ){
-		//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
+	if(  pinCorrect && (debounceSucessfull) ){
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
 		//_tim_timeout_blocking(2000);
 		//printDebug(&huart2 ,"  button action  \n\n \r");
 		if(buttonPressed == 0){
@@ -434,8 +434,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	}
 
 
-	__enable_irq();
-	HAL_ResumeTick();
+//	__enable_irq();
+//	HAL_ResumeTick();
 }
 
 /* USER CODE END 4 */

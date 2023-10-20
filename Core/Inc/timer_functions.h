@@ -8,6 +8,9 @@
 #ifndef INC_TIMER_FUNCTIONS_H_
 #define INC_TIMER_FUNCTIONS_H_
 
+// to test if the button has been pressed in the interrupt
+
+
 //implementation of a blocking timer function
 // par time: the time before the timer Action happens (system blocked until)
 void _tim_timeout_blocking(uint32_t time);

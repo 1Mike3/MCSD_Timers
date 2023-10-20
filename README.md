@@ -7,7 +7,9 @@
 * Created:		14.10.2023
 
 # Known Bugs:
-
+* Button Press function is a bit buggy, don't konw why, maybe you know what's going on
+* The non-Blocking funciton visuals only work correcty for the first button press because 
+the blinky function stays on for a while afterwards(the function itself is fine)
 
 # Function Description
 	The Code Runs in a While true loop in main.
@@ -17,11 +19,13 @@
 	To visually distiguish the funcitons:
 	Blocking funciton uses the green LED.
 	Non-Blocking fucntion uses the blue LED.
+	For a better visualization during the idle time the led flashes white to show that code is executed
+	during the timer wait time in the non-blocking funciton.(see bugs)
+	The delaytimes can be adjusted by defines in the main loop.
 	
 	
 
 # General Information:
-
 * Documentation of used functions is in .h and not .c file
 * Prints to Console implemented very crudely, but not part of assignment
 * Added Debug Statement and Toggle Red LED in Error handeler to detect if the System goes belly up
